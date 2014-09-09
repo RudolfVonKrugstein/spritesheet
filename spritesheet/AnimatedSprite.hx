@@ -8,6 +8,9 @@ import flash.events.Event;
 import flash.Lib;
 import spritesheet.data.BehaviorData;
 
+enum Flag {
+	BLEND_ADD;
+}
 
 @:access(spritesheet.Spritesheet)
 class AnimatedSprite extends Sprite {
@@ -39,12 +42,12 @@ class AnimatedSprite extends Sprite {
 		renderTarget = switch(sheet.imageData) {
 			case BITMAP_DATA(_,_):
 			if (sheet.useSingleBitmapData) {
-				new spritesheet.render.RenderBitmapRectToGraphics (graphics);
+				new spritesheet.render.RenderBitmapRectToGraphics (this);
 			} else {
-				new spritesheet.render.RenderWholeBitmapToGraphics (graphics);
+				new spritesheet.render.RenderWholeBitmapToGraphics (this);
 			}
 			case TILESHEET(ts):
-			new spritesheet.render.RenderTilesheetToGraphics(graphics, ts);
+			new spritesheet.render.RenderTilesheetToGraphics(this, ts);
 		}
 	}
 	
@@ -219,5 +222,14 @@ class AnimatedSprite extends Sprite {
 		
 	}
 	
+	public function setFlag(flag : Flag) {
+		renderTarget.enableFlag(flag);
+		update(0);
+	}
+
+	public function unsetFlag(flag : Flag) {
+		renderTarget.disableFlag(flag);
+		update(0);
+	}
 	
 }
