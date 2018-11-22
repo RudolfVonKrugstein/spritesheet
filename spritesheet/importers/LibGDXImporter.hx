@@ -4,6 +4,7 @@ package spritesheet.importers;
 
 import flash.display.BitmapData;
 import haxe.Json;
+import flash.geom.Rectangle;
 import spritesheet.data.BehaviorData;
 import spritesheet.data.SpritesheetFrame;
 using StringTools;
@@ -13,7 +14,8 @@ class LibGDXImporter {
 	
 	
 	public var frameRate:Int = 30;
-	
+
+    public var fileNameToFrameId:Map<String,Int> = new Map<String,Int>();
 	
 	public function new () {
 		
@@ -52,7 +54,8 @@ class LibGDXImporter {
 		
 		var allFrames = new Array<SpritesheetFrame>();
 		var allBehaviors = new Map <String, BehaviorData>();
-		
+		var tileset = openfl.display.Tileset(bitmapData);
+
 		for (key in behaviorNames.keys ()) {
 			
 			var indexes = new Array<Int> ();
@@ -62,11 +65,11 @@ class LibGDXImporter {
 				
 				var gdxFrame = frames[i];
 				var sFrame = new SpritesheetFrame (gdxFrame.xy.x, gdxFrame.xy.y, gdxFrame.size.w, gdxFrame.size.h, gdxFrame.offset.x, gdxFrame.orig.h - gdxFrame.size.h - gdxFrame.offset.y, gdxFrame.orig.w, gdxFrame.orig.h);
-				sFrame.name = gdxFrame.filename;
-				
+				sFrame.id = tileset.addRect(new Rectangle(gdxFrame.xy.x, gdxFrame.xy.y, gdxFrame.size.w, gdxFrame.size.h));
+				fileNameToFrameId[gdxFrame.filename] = sFrame.id;
 				indexes.push (allFrames.length);
 				allFrames.push (sFrame);
-				
+
 			}
 			
 			if (isIgnoredBehavior (key)) {
@@ -79,7 +82,7 @@ class LibGDXImporter {
 			
 		}
 		
-		return new Spritesheet (bitmapData, allFrames, allBehaviors);
+		return new Spritesheet (tileset, allFrames, allBehaviors);
 		
 	}
 	
